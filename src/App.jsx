@@ -13,7 +13,7 @@ const groceryItems = [
     id: 2,
     name: 'Gula Pasir',
     quantity: 5,
-    checked: true,
+    checked: false,
   },
   {
     id: 3,
@@ -66,10 +66,10 @@ function Form({onAddItem}) {
   );
 }
 
-function Item({item, onDeleteItem}) {
+function Item({item, onDeleteItem, onToggleItem}) {
   return(
     <li key={item.id}>
-      <input type="checkbox" />
+      <input type="checkbox" checked={item.checked} onChange={() => onToggleItem(item.id)} />
         <span style={item.checked ? { textDecoration: 'line-through' } : {}}>
           {item.quantity} {item.name}
         </span>
@@ -78,13 +78,14 @@ function Item({item, onDeleteItem}) {
   );
 }
 
-function GroceryList({items, onDeleteItem}){
+
+function GroceryList({items, onDeleteItem, onToggleItem}){
   return(
     <>
       <div className="list">
         <ul>
           {items.map((item) => (
-            <Item item={item} key={item.id} onDeleteItem={onDeleteItem}/>
+            <Item item={item} key={item.id} onDeleteItem={onDeleteItem} onToggleItem={onToggleItem}/>
           ))}
         </ul>
       </div>
@@ -106,6 +107,8 @@ function Footer() {
   <footer className="stats">Ada 10 barang di daftar belanjaan, 5 barang sudah dibeli (50%)</footer>
 }
 
+
+
 function App() {
   
 
@@ -113,10 +116,16 @@ function App() {
   const [items, setItems] = useState(groceryItems);
 
   // memasukan item kedalam items
-  function  handleAddItem(item) {
+  function handleAddItem(item) {
     // console.log([...items, item])
+    // set items jadi item
     setItems([...items, item])
   }
+
+  function handleToggleItem(id) {
+    setItems((items) => items.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item)));
+  }
+
   
 
   function handleDeleteItem(id) {
@@ -127,7 +136,7 @@ function App() {
     <div className="app">
       <Header/>
       <Form onAddItem={handleAddItem}/>
-      <GroceryList items={items} onDeleteItem={handleDeleteItem}/>
+      <GroceryList items={items} onDeleteItem={handleDeleteItem} onToggleItem={handleToggleItem}/>
       <Footer/>
     </div>
   );
@@ -135,4 +144,4 @@ function App() {
 
 export default App;
 
-// 59:33 : https://www.youtube.com/watch?v=HX2kAHnCEjY
+// 1:04:41  : https://www.youtube.com/watch?v=HX2kAHnCEjY
