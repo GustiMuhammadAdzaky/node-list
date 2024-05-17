@@ -79,23 +79,38 @@ function Item({item, onDeleteItem, onToggleItem}) {
 }
 
 
-function GroceryList({items, onDeleteItem, onToggleItem}){
+function GroceryList({items, onDeleteItem, onToggleItem, onClearItems}){
+  const [sortBy, setSortBy] = useState('input');
+
+  let sortedItems;
+
+  switch (sortBy) {
+    case 'name':
+      sortedItems = items.slice().sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case 'checked':
+      sortedItems = items.slice().sort((a, b) => a.checked - b.checked);
+      break;
+    default:
+      sortedItems = items;
+      break;
+  }
   return(
     <>
       <div className="list">
         <ul>
-          {items.map((item) => (
+          {sortedItems.map((item) => (
             <Item item={item} key={item.id} onDeleteItem={onDeleteItem} onToggleItem={onToggleItem}/>
           ))}
         </ul>
       </div>
       <div className="actions">
-        <select>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="input">Urutkan berdasarkan urutan input</option>
           <option value="name">Urutkan berdasarkan nama barang</option>
           <option value="checked">Urutkan berdasarkan ceklis</option>
         </select>
-        <button>Bersihkan Daftar</button>
+        <button onClick={onClearItems}>Bersihkan Daftar</button>
       </div>
     </>
   );
@@ -103,8 +118,12 @@ function GroceryList({items, onDeleteItem, onToggleItem}){
 
 
 
-function Footer() {
-  <footer className="stats">Ada 10 barang di daftar belanjaan, 5 barang sudah dibeli (50%)</footer>
+function Footer({items}) {
+  if (items.length === 0) return <footer className='stats'>Daftar Belanja Masih</footer>
+  const totalItems = items.length;
+  const checkedItems = items.filter((item) => item.checked).length;
+  const precentage = Math.round((checkedItems / totalItems) * 100);
+  return <footer className="stats">Ada {totalItems} barang di daftar belanjaan, {checkedItems} barang sudah dibeli {precentage}%</footer>
 }
 
 
@@ -132,16 +151,21 @@ function App() {
     setItems((items) => items.filter((item) => item.id !== id));
   }
 
+
+  function handleClearItems() {
+    setItems([]);
+  }
+
   return (
     <div className="app">
       <Header/>
       <Form onAddItem={handleAddItem}/>
-      <GroceryList items={items} onDeleteItem={handleDeleteItem} onToggleItem={handleToggleItem}/>
-      <Footer/>
+      <GroceryList items={items} onDeleteItem={handleDeleteItem} onToggleItem={handleToggleItem} onClearItems={handleClearItems}/>
+      <Footer items={items} />
     </div>
   );
 }
 
 export default App;
 
-// 1:04:41  : https://www.youtube.com/watch?v=HX2kAHnCEjY
+// 1:10:12   : https://www.youtube.com/watch?v=HX2kAHnCEjY
